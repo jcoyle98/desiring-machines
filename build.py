@@ -5,6 +5,9 @@
     python3 build.py --serve   # build, serve at http://localhost:8000,
                                # and rebuild whenever a file changes
 
+While "coming_soon" is true in config.json, a plain build (what GitHub
+runs) produces only a placeholder page; --serve always builds the full site.
+
 Poems live in posts/ as YYYY-MM-DD-slug.txt:
 
     Title of the Poem
@@ -104,13 +107,28 @@ def write_page(rel_path, title, content, config, depth):
     dest.write_text(page, encoding="utf-8")
 
 
-def build():
+def build_coming_soon(config):
+    page = Template((ROOT / "templates" / "coming-soon.html").read_text(encoding="utf-8"))
+    (OUT / "index.html").write_text(page.substitute(
+        site_title=html.escape(config["site_title"]),
+        description=html.escape(config["description"]),
+    ), encoding="utf-8")
+    (OUT / ".nojekyll").touch()
+    print("Built coming-soon page into _site/ (set coming_soon to false to publish)")
+
+
+def build(full=False):
+    """Build the site. Unless full=True, honour the coming_soon switch."""
     config = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))
     posts = load_posts()
 
     if OUT.exists():
         shutil.rmtree(OUT)
     shutil.copytree(ROOT / "static", OUT / "static")
+
+    if config.get("coming_soon") and not full:
+        build_coming_soon(config)
+        return
 
     # Landing / about page
     about = render_prose((ROOT / "about.txt").read_text(encoding="utf-8"))
@@ -168,7 +186,7 @@ def serve(port=8000):
             if current != last:
                 last = current
                 try:
-                    build()
+                    build(full=True)
                 except Exception as e:
                     print(f"  build failed: {e}")
     except KeyboardInterrupt:
@@ -176,6 +194,7 @@ def serve(port=8000):
 
 
 if __name__ == "__main__":
-    build()
-    if "--serve" in sys.argv:
+    serving = "--serve" in sys.argv
+    build(full=serving)  # the local preview always shows the full site
+    if serving:
         serve()

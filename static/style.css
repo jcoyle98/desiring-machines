@@ -95,3 +95,12 @@ footer.site {
   html { font-size: 18px; }
   .prose p { text-align: left; }
 }
+
+/* Coming-soon placeholder */
+body.coming-soon main {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
