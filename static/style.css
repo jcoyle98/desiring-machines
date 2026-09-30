@@ -1,0 +1,97 @@
+:root {
+  --text: #1a1a1a;
+  --muted: #6b6b6b;
+  --rule: #d8d8d8;
+  --accent: #800000; /* UChicago maroon */
+  --bg: #fff;
+}
+
+* { box-sizing: border-box; }
+
+html { font-size: 20px; }
+
+body {
+  margin: 0 auto;
+  max-width: 36rem;
+  padding: 2.5rem 1.25rem 4rem;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "EB Garamond", Garamond, "Times New Roman", Georgia, serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Header */
+header.site {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem 1.5rem;
+  padding-bottom: 0.6rem;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+.site-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+nav a { margin-left: 1.25rem; font-variant: small-caps; letter-spacing: 0.04em; }
+nav a:first-child { margin-left: 0; }
+
+/* Type */
+h1 { font-size: 1.7rem; font-weight: 400; line-height: 1.2; margin: 0 0 0.3rem; }
+h2 { font-size: 1.25rem; font-weight: 600; margin: 2rem 0 0.5rem; }
+h3 { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
+p { margin: 0 0 1rem; }
+
+.prose p { text-align: justify; hyphens: auto; }
+
+blockquote {
+  margin: 1.25rem 0;
+  padding-left: 1.25rem;
+  border-left: 2px solid var(--rule);
+  color: #3a3a3a;
+}
+
+.meta { color: var(--muted); font-size: 0.85rem; font-style: italic; }
+
+/* Index of writings */
+ul.index { list-style: none; padding: 0; margin: 1.5rem 0 0; }
+ul.index li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px dotted var(--rule);
+}
+ul.index a { font-size: 1.05rem; }
+
+/* Poems */
+article > header { margin-bottom: 2rem; }
+.poem .stanza { margin: 0 0 1.4rem; }
+.poem .line {
+  display: block;
+  padding-left: 2em;   /* long lines wrap with a hanging indent */
+  text-indent: -2em;
+}
+
+footer.site {
+  margin-top: 4rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 480px) {
+  html { font-size: 18px; }
+  .prose p { text-align: left; }
+}

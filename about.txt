@@ -1,0 +1,3 @@
+Write the about page here. This text becomes the landing page.
+
+Separate paragraphs with a blank line. Wrap a phrase in *asterisks* for italics.

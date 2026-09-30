@@ -1,0 +1,10 @@
+Example Poem
+
+This file shows the format. Its name starts with an underscore,
+    so it is treated as a draft and not published.
+Delete it once your first real poem is in.
+
+A blank line starts a new stanza.
+Leading spaces are kept as indentation,
+        however deep you like.
+Use *asterisks* for italics.
