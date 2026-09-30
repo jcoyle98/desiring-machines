@@ -1,9 +1,9 @@
 :root {
   --text: #1a1a1a;
   --muted: #6b6b6b;
-  --rule: #d8d8d8;
+  --rule: #ddd4c2;
   --accent: #800000; /* UChicago maroon */
-  --bg: #fff;
+  --bg: #faf6ec;
 }
 
 * { box-sizing: border-box; }
