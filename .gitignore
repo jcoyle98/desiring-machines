@@ -1,3 +1,6 @@
 _site/
 __pycache__/
 .DS_Store
+
+# Drafts (any file or collection folder starting with "_") stay on this computer
+writings/**/_*

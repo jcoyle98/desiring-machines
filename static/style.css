@@ -16,9 +16,11 @@ body {
   padding: 2.5rem 1.25rem 4rem;
   background: var(--bg);
   color: var(--text);
-  font-family: "EB Garamond", Garamond, "Times New Roman", Georgia, serif;
+  /* EB Garamond covers Latin (all accents) and polytonic Greek;
+     Tiro Devanagari Sanskrit fills in Devanagari. */
+  font-family: "EB Garamond", "Tiro Devanagari Sanskrit", Garamond, "Times New Roman", Georgia, serif;
   line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
+  /* Default font smoothing: macOS's "antialiased" mode renders EB Garamond too thin */
 }
 
 a { color: var(--accent); text-decoration: none; }
@@ -50,20 +52,34 @@ h2 { font-size: 1.25rem; font-weight: 600; margin: 2rem 0 0.5rem; }
 h3 { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
 p { margin: 0 0 1rem; }
 
-.prose p { text-align: justify; hyphens: auto; }
+.prose p { text-align: justify; -webkit-hyphens: auto; hyphens: auto; }
 
-blockquote {
-  margin: 1.25rem 0;
-  padding-left: 1.25rem;
-  border-left: 2px solid var(--rule);
-  color: #3a3a3a;
-}
+/* Essays: set like a book. No space between paragraphs, first line indented,
+   except the first paragraph, the one after a section break, and text that
+   continues a paragraph after a block quote (.cont). */
+.essay p { margin: 0; text-indent: 1.5em; }
+.essay header + p,
+.essay p.center + p,
+.essay p.cont,
+.essay blockquote p:first-child,
+.essay p.center,
+.essay .post-date { text-indent: 0; }
+.essay p.center { margin: 1rem 0; }
+.essay .post-date { margin-top: 2rem; }
+/* <poem> passages inside essays: verse layout, not book paragraphs */
+.prose .poem p { text-align: left; text-indent: 0; hyphens: manual; }
+.prose .poem .stanza { margin-bottom: 1rem; }
+.prose .poem .stanza:last-child { margin-bottom: 0; }
+
+/* Block quotes ("""...""" in essays): same as the text, inset on both sides */
+blockquote { margin: 1.25rem 2em; padding: 0; }
 
 .meta { color: var(--muted); font-size: 0.85rem; font-style: italic; }
 
 /* Index of writings */
-ul.index { list-style: none; padding: 0; margin: 1.5rem 0 0; }
-ul.index li {
+.index { list-style: none; padding: 0; margin: 0.5rem 0 0; }
+.index li.empty { color: var(--muted); font-style: italic; }
+.index li {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -72,7 +88,8 @@ ul.index li {
   padding: 0.55rem 0;
   border-bottom: 1px dotted var(--rule);
 }
-ul.index a { font-size: 1.05rem; }
+.index a { font-size: 1.05rem; }
+.index .meta { margin-left: auto; text-align: right; }  /* dates flush right, even when wrapped */
 
 /* Poems */
 article > header { margin-bottom: 2rem; }
@@ -82,6 +99,10 @@ article > header { margin-bottom: 2rem; }
   padding-left: 2em;   /* long lines wrap with a hanging indent */
   text-indent: -2em;
 }
+.post-date { font-style: italic; margin-top: 2rem; text-align: right; }
+.prose .post-date { text-align: right; }  /* beats the justified .prose p rule */
+.prose p.center { text-align: center; }
+.poem .line.center { text-align: center; padding: 0 1em; text-indent: 0; }
 
 footer.site {
   margin-top: 4rem;
@@ -93,7 +114,7 @@ footer.site {
 
 @media (max-width: 480px) {
   html { font-size: 18px; }
-  .prose p { text-align: left; }
+  .prose:not(.essay) p { text-align: left; }  /* essays stay justified */
 }
 
 /* Coming-soon placeholder */
@@ -104,3 +125,52 @@ body.coming-soon main {
   justify-content: center;
   text-align: center;
 }
+
+/* Right annotations in poems (e.g. strophe labels): flush right, level with the line */
+.poem .annot {
+  float: right;
+  margin-left: 1.5em;
+  text-indent: 0;
+}
+
+/* Collections */
+.collection-name { margin: 0 0 0.4rem; font-size: 0.9rem; }
+ol.contents { list-style: upper-roman; padding-left: 2.5em; margin: 1.5rem 0 0; }
+ol.contents li { padding: 0.25rem 0 0.25rem 0.75em; }  /* gap between numeral and title */
+nav.sequence {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9rem;
+}
+nav.sequence .prev, nav.sequence .next { flex: 1; }
+nav.sequence .next { text-align: right; }
+
+/* Collections on the Writings page: a header that folds open */
+details.collection { margin: 1.25rem 0 1.5rem; }
+details.collection summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.2rem;
+}
+details.collection summary::-webkit-details-marker { display: none; }
+details.collection summary h3 { margin: 0; font-size: 1.1rem; font-style: italic; font-weight: 400; }
+details.collection summary h3::before {
+  content: "▸";
+  display: inline-block;
+  width: 1.1em;
+  font-style: normal;
+  font-size: 0.8em;
+  color: var(--accent);
+  transition: transform 0.15s;
+}
+details.collection[open] summary h3::before { transform: rotate(90deg); }
+details.collection ol.index { margin: 0 0 0 1.4em; }
