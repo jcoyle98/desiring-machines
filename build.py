@@ -309,8 +309,12 @@ def meta(p):
         parts.append("draft")
     return " · ".join(parts)
 def css_version():
-    """Changes whenever style.css does, so browsers never use a stale copy."""
-    return hashlib.md5((ROOT / "static" / "style.css").read_bytes()).hexdigest()[:8]
+    """Changes whenever anything in static/ does, so browsers never use a stale copy."""
+    h = hashlib.md5()
+    for f in sorted((ROOT / "static").rglob("*")):
+        if f.is_file():
+            h.update(f.read_bytes())
+    return h.hexdigest()[:8]
 
 
 def write_page(rel_path, title, content, config, depth):
@@ -402,6 +406,7 @@ def build(full=False):
     if OUT.exists():
         shutil.rmtree(OUT)
     shutil.copytree(ROOT / "static", OUT / "static")
+    shutil.copy(ROOT / "static" / "favicon.ico", OUT / "favicon.ico")  # browsers look for it at the root
 
     if config.get("coming_soon") and not full:
         build_coming_soon(config)
