@@ -256,7 +256,8 @@ def load_collection(folder, default_kind, include_drafts):
         name = entry.lstrip("_") + ("" if entry.endswith(".txt") else ".txt")
         path = next((p for p in (folder / name, folder / f"_{name}") if p.exists()), None)
         if path is None:
-            print(f"  warning: {folder.name}/index.txt lists {entry!r}, but there is no such file")
+            if include_drafts:  # on GitHub, drafts are absent on purpose (git ignores them)
+                print(f"  warning: {folder.name}/index.txt lists {entry!r}, but there is no such file")
             continue
         listed.add(path.name)
         piece = parse_piece(path, default_kind)
@@ -275,6 +276,8 @@ def load_section(folder, default_kind, include_drafts=False):
     """Standalone pieces (newest first) and collections (alphabetical by folder)."""
     root = ROOT / "writings" / folder
     pieces, collections = [], []
+    if not root.is_dir():  # e.g. a section whose only files are drafts, which git ignores
+        return pieces, collections
     for path in sorted(root.glob("*.txt")):
         if path.name.startswith("_") and not include_drafts:
             continue
