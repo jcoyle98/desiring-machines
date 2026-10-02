@@ -197,8 +197,12 @@ def render_prose(text):
     return "\n".join(html_parts)
 
 
-# folder -> (heading, default kind of piece)
-SECTIONS = {"poetry": ("Poetry", "poem"), "essays": ("Essays", "essay")}
+# folder -> (heading, default kind of piece, order of standalone pieces)
+SECTIONS = {
+    "poetry": ("Poetry", "poem", "newest first"),
+    "essays": ("Essays", "essay", "newest first"),
+    "reviews": ("Reviews", "essay", "oldest first"),
+}
 RENDER = {"poem": render_poem, "essay": render_prose}
 ARTICLE_CLASS = {"poem": "", "essay": "prose essay"}
 DATE_PREFIX_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-")
@@ -272,7 +276,7 @@ def load_collection(folder, default_kind, include_drafts):
     return {"slug": folder.name.lstrip("_"), "title": title.strip(), "pieces": pieces, "draft": draft}
 
 
-def load_section(folder, default_kind, include_drafts=False):
+def load_section(folder, default_kind, order, include_drafts=False):
     """Standalone pieces (newest first) and collections (alphabetical by folder)."""
     root = ROOT / "writings" / folder
     pieces, collections = [], []
@@ -287,7 +291,7 @@ def load_section(folder, default_kind, include_drafts=False):
                   "name, or a 'date:' line under the title)")
             continue
         pieces.append(piece)
-    pieces.sort(key=lambda p: p["date"], reverse=True)
+    pieces.sort(key=lambda p: p["date"], reverse=(order == "newest first"))
     for sub in sorted(d for d in root.iterdir() if d.is_dir()):
         c = load_collection(sub, default_kind, include_drafts)
         if c:
@@ -413,8 +417,8 @@ def build(full=False):
     # standalone pieces. Pieces live at writings/<section>/<slug>/ and, in a
     # collection, at writings/<section>/<collection>/<slug>/.
     counts, sections = [], []
-    for folder, (heading, default_kind) in SECTIONS.items():
-        pieces, collections = load_section(folder, default_kind, include_drafts=full)
+    for folder, (heading, default_kind, order) in SECTIONS.items():
+        pieces, collections = load_section(folder, default_kind, order, include_drafts=full)
         counts.append(f"{len(pieces)} {folder} + {len(collections)} collection(s)")
 
         # Standalone pieces first, then each collection under its own header
@@ -425,8 +429,8 @@ def build(full=False):
         )
         parts = [f'<ul class="index">\n{rows}\n</ul>'] if rows else []
         parts += [collection_block(folder, c) for c in collections]
-        body = "\n".join(parts) or '<ul class="index"><li class="empty">Nothing yet.</li></ul>'
-        sections.append(f'<section>\n<h2>{heading}</h2>\n{body}\n</section>')
+        if parts:  # sections with nothing to show are left off the page
+            sections.append(f'<section>\n<h2>{heading}</h2>\n' + "\n".join(parts) + '\n</section>')
 
         for p in pieces:
             write_piece(f"writings/{folder}/{p['slug']}", p, config, depth=3)

@@ -4,8 +4,9 @@ A tiny static site for poems. Plain-text files in, HTML out, no dependencies bey
 
 ## Add a poem or essay
 
-Poems go in `writings/poetry/`, essays in `writings/essays/`, named `YYYY-MM-DD-some-slug.txt`.
-Both are listed, in separate sections, on the Writings page.
+Poems go in `writings/poetry/`, essays in `writings/essays/`, reviews in `writings/reviews/`, named `YYYY-MM-DD-some-slug.txt`.
+Each is listed in its own section on the Writings page: poems and essays newest
+first, reviews oldest first. Sections with nothing published are left off.
 The first line is the title, then a blank line, then the text.
 
 A poem keeps its line breaks and indentation exactly:
