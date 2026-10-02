@@ -27,7 +27,7 @@ Theban harlots all,
 We have born witness to this hesperal 
 Motif, this savage enjambment.
 
-Descends the caparisoned deer <right-annotation>[trn. 1.<\right-annotation>
+Descends the caparisoned deer <right-annotation>[turn 1<\right-annotation>
 Draped in an ebony cuirass
 And armed with a gleaming edge,
 Straight to my groundings the candor
@@ -38,7 +38,7 @@ Slouching towards finality,
 But whether eternity or oblivion
 Is not to his mind revealed.
 
-She is soft in the softness of her bed, <right-annotation>[cntrt. 1.<\right-annotation>
+She is soft in the softness of her bed, <right-annotation>[countrt. 1.<\right-annotation>
 Soft on brown heapings of leaves
 Dappled with dirt and electric.
 This cyanic buoyancy, supine
@@ -49,7 +49,7 @@ She the frigid nymph
 Dripping with spring water, flashing
 Her frills in an outlandish mode.
 
-Eyes painted white <right-annotation>[trn 2.<\right-annotation>
+Eyes painted white <right-annotation>[turn 2<\right-annotation>
 Black bafflings of bodies
 The deep well surrounded by stone 
 Teeth loud like trumpets and legs 
@@ -60,7 +60,7 @@ The master of night and of earth
 Slithers like fog round my lover 
 The python clutches his bane.
 
-Fur of the lynx and wine <right-annotation>[cntrt. 2.<\right-annotation>
+Fur of the lynx and wine <right-annotation>[countrt. 2.<\right-annotation>
 The bleating of goats the rage 
 Orgies and dancings descendings 
 For pleasure in temporary imitations
