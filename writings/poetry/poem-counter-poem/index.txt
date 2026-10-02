@@ -1,4 +1,4 @@
-Poem/Counter-Poem
+Poem / Counter-Poem
 
 2026-10-01-introduction.txt
 2026-10-01-flying-music.txt

@@ -335,8 +335,7 @@ def inline_title(title):
 
 
 def collection_meta(c):
-    n = len(c["pieces"])
-    return f"{n} piece{'s' if n != 1 else ''}" + (" · draft" if c["draft"] else "")
+    return '<span class="meta">draft</span>' if c["draft"] else ""  # only drafts get a label
 
 
 def collection_block(folder, c):
@@ -347,7 +346,7 @@ def collection_block(folder, c):
         for p in c["pieces"]
     ) or '<li class="empty">Nothing yet.</li>'
     return (f'<details class="collection" open>\n<summary><h3>{inline_title(c["title"])}</h3>'
-            f'<span class="meta">{collection_meta(c)}</span></summary>\n'
+            f'{collection_meta(c)}</summary>\n'
             f'<ol class="index">\n{items}\n</ol>\n</details>')
 
 
