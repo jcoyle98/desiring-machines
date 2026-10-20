@@ -18,7 +18,7 @@ First line
     indented line (tabs or spaces; a tab = 4 spaces)
 
 A blank line starts a new stanza.
-*Asterisks* make italics.
+*Asterisks* make italics, **double asterisks** make bold.
 | A line starting with a bar is centered.
 ```
 
@@ -45,6 +45,21 @@ indent). Leave a blank line after the quote to start a new, indented paragraph.
 To quote verse inside an essay, put it between `<poem>` and `</poem>`. Inside, the
 poem rules apply (line breaks, indentation, stanzas, `|` for centered lines), and the
 passage is inset like a quote. The same continue-or-new-paragraph rule applies after it.
+
+### Subtitles and epigraphs
+
+Wrap them in tags, anywhere in the file (usually right under the title):
+
+```
+Onstage
+<subtitle>after Giorgos Seferis</subtitle>
+<epigraph>a line someone else wrote
+— its author</epigraph>
+```
+
+Both are set in italics. The subtitle sits flush left under the title; the epigraph is right-aligned above the
+text and keeps its line breaks. `</subtitle>` or `<\subtitle>` both close them. `*asterisks*` inside them set
+those words upright, and `<sanskrit>` works too.
 
 ### Poem or prose
 

@@ -174,3 +174,12 @@ details.collection summary h3::before {
 }
 details.collection[open] summary h3::before { transform: rotate(90deg); }
 details.collection ol.index { margin: 0 0 0 1.4em; }
+
+/* <subtitle> and <epigraph> */
+.subtitle { font-style: italic; font-size: 1.1rem; margin: .3rem 0 0; text-align: left; }
+.epigraph { margin: 0 0 2.2rem; font-style: italic; text-align: right; }
+.epigraph p { margin: 0; text-indent: 0 !important; text-align: right !important; }
+.epigraph em, .subtitle em { font-style: normal; }  /* *italics* inside read as roman */
+
+/* **bold**: EB Garamond semibold (also in italics) */
+strong { font-weight: 600; }

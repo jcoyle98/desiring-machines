@@ -20,7 +20,7 @@ Poems keep their line breaks and indentation:
     First line of the poem
         indented line (leading spaces are kept)
 
-    Second stanza (blank line = new stanza), *italic words*
+    Second stanza (blank line = new stanza), *italic words*, **bold words**
     | a line starting with "|" is centered
 
 Essays are prose: a blank line separates paragraphs, and line breaks
@@ -37,6 +37,9 @@ leave a blank line after the quote to start a new, indented paragraph.
 A file may start with a <poem> or <prose> line to say how it is set; without
 one, files in poetry/ are poems and files in essays/ are prose. Under the title,
 before the blank line, "date: 2026-10-01" can stand in for a date in the name.
+<subtitle>...</subtitle> (italic, flush left under the title) and
+<epigraph>...</epigraph> (italic, right-aligned above the text, line breaks kept)
+can go anywhere in the file.
 
 In a poem, <annotation>...</annotation> anywhere on a line sets whatever is
 between the tags flush right, level with the line (e.g. [strophe 1]).
@@ -121,8 +124,9 @@ def read_text(path):
 
 
 def inline(text):
-    """Escape HTML, then turn *words* into italics."""
-    return re.sub(r"\*(\S(?:.*?\S)?)\*", r"<em>\1</em>", html.escape(text))
+    """Escape HTML, then turn **words** into bold and *words* into italics."""
+    text = re.sub(r"\*\*(\S(?:.*?\S)?)\*\*", r"<strong>\1</strong>", html.escape(text))
+    return re.sub(r"\*(\S(?:.*?\S)?)\*", r"<em>\1</em>", text)
 
 
 def blocks(text):
@@ -205,6 +209,8 @@ SECTIONS = {
 }
 RENDER = {"poem": render_poem, "essay": render_prose}
 ARTICLE_CLASS = {"poem": "", "essay": "prose essay"}
+HEADER_KEYS = ("date",)
+TAG_RE = {k: re.compile(rf"<{k}>(.*?)<[/\\\\]{k}>[ \t]*\n?", re.S) for k in ("subtitle", "epigraph")}
 DATE_PREFIX_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-")
 
 
@@ -217,16 +223,23 @@ def parse_piece(path, default_kind):
     if m:
         kind = "poem" if m.group(1) == "poem" else "essay"
         text = re.sub(r"\n[ \t]*<[/\\](poem|prose)>$", "", text[m.end():])  # optional closing tag
+    tags = {}
+    for k, rx in TAG_RE.items():  # <subtitle>…</subtitle>, <epigraph>…</epigraph>, anywhere in the file
+        m2 = rx.search(text)
+        if m2:
+            tags[k] = m2.group(1).strip()
+            text = rx.sub("", text, count=1)
     header, _, body = re.split(r"(\n[ \t]*\n)", text + "\n\n", 1)
     title, *meta_lines = header.splitlines()
     meta = {}
     for line in meta_lines:
         key, sep, value = line.partition(":")
-        if sep and key.strip().lower() == "date":
-            meta["date"] = value.strip()
+        key = key.strip().lower()
+        if sep and key in HEADER_KEYS:
+            meta[key] = value.strip()
         else:
             print(f"  warning: {path.name}: ignoring header line {line!r} "
-                  "(expected date:, then a blank line before the text)")
+                  f"(expected one of {', '.join(k + ':' for k in HEADER_KEYS)} then a blank line before the text)")
 
     name = path.stem.lstrip("_")
     m = DATE_PREFIX_RE.match(name)
@@ -238,6 +251,8 @@ def parse_piece(path, default_kind):
         "kind": kind,
         "html": RENDER[kind](body),
         "draft": path.name.startswith("_"),
+        "subtitle": tags.get("subtitle", ""),
+        "epigraph": tags.get("epigraph", ""),
     }
 
 
@@ -355,10 +370,15 @@ def collection_block(folder, c):
 
 def write_piece(rel_dir, p, config, depth, above="", below=""):
     date_line = f'\n<p class="post-date">{meta(p)}</p>' if meta(p) else ""
+    subtitle = f'<p class="subtitle">{inline(p["subtitle"])}</p>' if p.get("subtitle") else ""
+    epigraph = ""
+    if p.get("epigraph"):
+        lines = "<br>".join(inline(l.strip()) for l in p["epigraph"].splitlines() if l.strip())
+        epigraph = f'<blockquote class="epigraph"><p>{lines}</p></blockquote>\n'
     content = (
         f'<article class="{ARTICLE_CLASS[p["kind"]]}">\n{above}'
-        f'<header><h1>{inline_title(p["title"])}</h1></header>\n'
-        f'{p["html"]}{date_line}\n</article>{below}'
+        f'<header><h1>{inline_title(p["title"])}</h1>{subtitle}</header>\n'
+        f'{epigraph}{p["html"]}{date_line}\n</article>{below}'
     )
     write_page(f"{rel_dir}/index.html", p["title"], content, config, depth)
 
