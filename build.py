@@ -323,7 +323,6 @@ def write_page(rel_path, title, content, config, depth):
         root="../" * depth,
         title=html.escape(title),
         site_title=html.escape(config["site_title"]),
-        author=html.escape(config["author"]),
         description=html.escape(config["description"]),
         year=date.today().year,
         css_version=css_version(),

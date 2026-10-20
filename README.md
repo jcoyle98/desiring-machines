@@ -116,7 +116,7 @@ GitHub Actions rebuilds and deploys the site in about a minute.
 | What | Where |
 |---|---|
 | About / landing page | `about.txt` (blank line between paragraphs) |
-| Site title, author, description | `config.json` |
+| Site title, description | `config.json` |
 | Coming-soon placeholder on the live site | `"coming_soon": true` in `config.json` (set to `false` to launch) |
 | Page layout | `templates/base.html` |
 | Styling | `static/style.css` |
