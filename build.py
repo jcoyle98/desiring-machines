@@ -431,35 +431,35 @@ def build(full=False):
         build_coming_soon(config)
         return
 
-    # Landing / about page
-    about = render_prose(read_text(ROOT / "about.txt"))
-    write_page("index.html", config["site_title"],
-               f'<article class="prose">\n{about}\n</article>', config, depth=0)
-
     # Writings page: one subsection per section, collections first, then
     # standalone pieces. Pieces live at writings/<section>/<slug>/ and, in a
     # collection, at writings/<section>/<collection>/<slug>/.
-    counts, sections = [], []
+    counts, sections, home_sections = [], [], []
     for folder, (heading, default_kind, order) in SECTIONS.items():
         pieces, collections = load_section(folder, default_kind, order, include_drafts=full)
         counts.append(f"{len(pieces)} {folder} + {len(collections)} collection(s)")
 
-        # Standalone pieces first, then each collection under its own header
-        rows = "\n".join(
-            f'<li><a href="{folder}/{p["slug"]}/">{inline_title(p["title"])}</a>'
-            f'<span class="meta">{meta(p)}</span></li>'
-            for p in pieces
-        )
-        parts = [f'<ul class="index">\n{rows}\n</ul>'] if rows else []
-        parts += [collection_block(folder, c) for c in collections]
-        if parts:  # sections with nothing to show are left off the page
-            sections.append(f'<section>\n<h2>{heading}</h2>\n' + "\n".join(parts) + '\n</section>')
+        # Standalone pieces first, then each collection under its own header. The list is written twice:
+        # as the home page (links start "writings/") and at writings/ (the old address, links relative)
+        for prefix, out in (("", sections), ("writings/", home_sections)):
+            rows = "\n".join(
+                f'<li><a href="{prefix}{folder}/{p["slug"]}/">{inline_title(p["title"])}</a>'
+                f'<span class="meta">{meta(p)}</span></li>'
+                for p in pieces
+            )
+            parts = [f'<ul class="index">\n{rows}\n</ul>'] if rows else []
+            parts += [collection_block(prefix + folder, c) for c in collections]
+            if parts:  # sections with nothing to show are left off the page
+                out.append(f'<section>\n<h2>{heading}</h2>\n' + "\n".join(parts) + '\n</section>')
 
         for p in pieces:
             write_piece(f"writings/{folder}/{p['slug']}", p, config, depth=3)
         for c in collections:
             write_collection(f"writings/{folder}/{c['slug']}", c, config)
 
+    # the Writings are the home page (there is no About page any more); writings/ keeps working too
+    write_page("index.html", config["site_title"],
+               "<h1>Writings</h1>\n" + "\n".join(home_sections), config, depth=0)
     write_page("writings/index.html", "Writings",
                "<h1>Writings</h1>\n" + "\n".join(sections), config, depth=1)
 
@@ -470,7 +470,7 @@ def build(full=False):
 
 
 def snapshot():
-    watched = [ROOT / "about.txt", ROOT / "config.json", ROOT / "build.py"]
+    watched = [ROOT / "config.json", ROOT / "build.py"]
     for folder in ("writings", "templates", "static"):
         watched += (ROOT / folder).rglob("*")
     return {p: p.stat().st_mtime for p in watched if p.is_file()}
