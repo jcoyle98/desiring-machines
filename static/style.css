@@ -98,6 +98,7 @@ article > header { margin-bottom: 2rem; }
   display: block;
   padding-left: 2em;   /* long lines wrap with a hanging indent */
   text-indent: -2em;
+  margin-left: min(var(--indent, 0em), 40%);   /* leading spaces indent, but never past 40% of the column */
 }
 .post-date { font-style: italic; margin-top: 2rem; text-align: right; }
 .prose .post-date { text-align: right; }  /* beats the justified .prose p rule */
@@ -183,3 +184,8 @@ details.collection ol.index { margin: 0 0 0 1.4em; }
 
 /* **bold**: EB Garamond semibold (also in italics) */
 strong { font-weight: 600; }
+
+/* Several poems as one piece (<poems>): each poem's title smaller than the piece's, its date under it */
+.sequence .part + .part { margin-top: 3rem; }
+.sequence .part-title { font-size: 1.35rem; font-weight: 400; margin: 0 0 1.2rem; }
+.sequence .part-date { font-style: italic; text-align: right; margin: 0; }

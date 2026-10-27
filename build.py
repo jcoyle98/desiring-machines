@@ -49,6 +49,10 @@ index.txt. Its first line is the collection's title; after a blank line, list
 the pieces' file names in reading order. Pieces in a collection don't need a
 date. The collection gets a contents page, and each piece links to the next.
 
+Several poems as one piece: start the file with a <poems> line, then the title (and any
+"date:" line), a blank line, and the poems, each beginning with a <title>...</title> line and
+optionally a <date>YYYY-MM-DD</date> line before its text; each poem's date is set under it.
+
 A file or collection folder whose name starts with "_" is a draft: skipped on
 the live site, shown in the local preview.
 """
@@ -151,7 +155,7 @@ def render_poem(body):
                 lines.append(f'<span class="line center">{notes}{inline(stripped[1:].strip())}</span>')
                 continue
             indent = len(line[: len(line) - len(stripped)].expandtabs(4))
-            style = f' style="margin-left:{indent * 0.5:g}em"' if indent else ""
+            style = f' style="--indent:{indent * 0.5:g}em"' if indent else ""   # capped by the stylesheet
             text = inline(stripped) or "&nbsp;"
             lines.append(f'<span class="line"{style}>{notes}{text}</span>')
         stanzas.append('<p class="stanza">\n' + "\n".join(lines) + "\n</p>")
@@ -201,14 +205,36 @@ def render_prose(text):
     return "\n".join(html_parts)
 
 
+PART_TITLE_RE = re.compile(r"^[ \t]*<title>(.*?)<[/\\]title>[ \t]*\n?", re.M)
+PART_DATE_RE = re.compile(r"[ \t]*<date>(.*?)<[/\\]date>[ \t]*\n?")
+
+
+def render_sequence(body):
+    """Several poems set as one piece (a file starting with a <poems> line). Each poem begins with a
+    <title>...</title> line, then optionally a <date>YYYY-MM-DD</date> line, then its text, laid out like a
+    poem file; its date is set under it. Text before the first <title> is set as a poem, as a preface."""
+    parts = PART_TITLE_RE.split(body)
+    out = [render_poem(parts[0])] if parts[0].strip() else []
+    for title, text in zip(parts[1::2], parts[2::2]):
+        when = ""
+        m = PART_DATE_RE.match(text)
+        if m:
+            when = fmt_date(date.fromisoformat(m.group(1).strip()))
+            text = text[m.end():]
+        dated = f'\n<p class="part-date">{when}</p>' if when else ""
+        out.append(f'<section class="part">\n<h2 class="part-title">{inline(title.strip())}</h2>\n'
+                   f'{render_poem(text)}{dated}\n</section>')
+    return "\n".join(out)
+
+
 # folder -> (heading, default kind of piece, order of standalone pieces)
 SECTIONS = {
     "poetry": ("Poetry", "poem", "newest first"),
     "essays": ("Essays", "essay", "newest first"),
     "reviews": ("Reviews", "essay", "oldest first"),
 }
-RENDER = {"poem": render_poem, "essay": render_prose}
-ARTICLE_CLASS = {"poem": "", "essay": "prose essay"}
+RENDER = {"poem": render_poem, "essay": render_prose, "sequence": render_sequence}
+ARTICLE_CLASS = {"poem": "", "essay": "prose essay", "sequence": "sequence"}
 HEADER_KEYS = ("date",)
 TAG_RE = {k: re.compile(rf"<{k}>(.*?)<[/\\\\]{k}>[ \t]*\n?", re.S) for k in ("subtitle", "epigraph")}
 DATE_PREFIX_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-")
@@ -219,10 +245,10 @@ def parse_piece(path, default_kind):
     "date: YYYY-MM-DD" line, blank line, text."""
     text = read_text(path).strip()
     kind = default_kind
-    m = re.match(r"<(poem|prose)>[ \t]*\n", text)
+    m = re.match(r"<(poems|poem|prose)>[ \t]*\n", text)
     if m:
-        kind = "poem" if m.group(1) == "poem" else "essay"
-        text = re.sub(r"\n[ \t]*<[/\\](poem|prose)>$", "", text[m.end():])  # optional closing tag
+        kind = {"poem": "poem", "prose": "essay", "poems": "sequence"}[m.group(1)]
+        text = re.sub(r"\n[ \t]*<[/\\](poems|poem|prose)>$", "", text[m.end():])  # optional closing tag
     tags = {}
     for k, rx in TAG_RE.items():  # <subtitle>…</subtitle>, <epigraph>…</epigraph>, anywhere in the file
         m2 = rx.search(text)
@@ -369,7 +395,8 @@ def collection_block(folder, c):
 
 
 def write_piece(rel_dir, p, config, depth, above="", below=""):
-    date_line = f'\n<p class="post-date">{meta(p)}</p>' if meta(p) else ""
+    # several poems as one piece carry their own dates, under each poem
+    date_line = f'\n<p class="post-date">{meta(p)}</p>' if meta(p) and p["kind"] != "sequence" else ""
     subtitle = f'<p class="subtitle">{inline(p["subtitle"])}</p>' if p.get("subtitle") else ""
     epigraph = ""
     if p.get("epigraph"):
