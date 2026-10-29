@@ -484,6 +484,16 @@ def build(full=False):
         for c in collections:
             write_collection(f"writings/{folder}/{c['slug']}", c, config)
 
+    # links to outside resources, listed under the writings (from "resources" in config.json)
+    resources = config.get("resources", [])
+    if resources:
+        rows = "\n".join(
+            f'<li><a href="{html.escape(r["url"])}">{html.escape(r["title"])}</a></li>' for r in resources
+        )
+        block = f'<section>\n<h2>Resources</h2>\n<ul class="index">\n{rows}\n</ul>\n</section>'
+        home_sections.append(block)
+        sections.append(block)
+
     # the Writings are the home page (there is no About page any more); writings/ keeps working too
     write_page("index.html", config["site_title"],
                "<h1>Writings</h1>\n" + "\n".join(home_sections), config, depth=0)
