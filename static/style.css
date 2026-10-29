@@ -150,11 +150,10 @@ nav.sequence {
 nav.sequence .prev, nav.sequence .next { flex: 1; }
 nav.sequence .next { text-align: right; }
 
-/* Collections on the Writings page: a header that folds open */
-details.collection { margin: 1.25rem 0 1.5rem; }
-details.collection summary {
-  list-style: none;
-  cursor: pointer;
+/* Collections on the Writings page: the title (black, a link to the collection's contents)
+   with its pieces indented underneath */
+.collection { margin: 1.25rem 0 1.5rem; }
+.collection-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -162,19 +161,9 @@ details.collection summary {
   border-bottom: 1px solid var(--rule);
   padding-bottom: 0.2rem;
 }
-details.collection summary::-webkit-details-marker { display: none; }
-details.collection summary h3 { margin: 0; font-size: 1.1rem; font-style: italic; font-weight: 400; }
-details.collection summary h3::before {
-  content: "▸";
-  display: inline-block;
-  width: 1.1em;
-  font-style: normal;
-  font-size: 0.8em;
-  color: var(--accent);
-  transition: transform 0.15s;
-}
-details.collection[open] summary h3::before { transform: rotate(90deg); }
-details.collection ol.index { margin: 0 0 0 1.4em; }
+.collection-head h3 { margin: 0; font-size: 1.1rem; font-style: italic; font-weight: 400; }
+.collection-head h3 a { color: var(--text); }
+.collection ol.index { margin: 0 0 0 1.4em; }
 
 /* <subtitle> and <epigraph> */
 .subtitle { font-style: italic; font-size: 1.1rem; margin: .3rem 0 0; text-align: left; }

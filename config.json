@@ -7,5 +7,10 @@
       "title": "Sanskrit Dictionary and Lemmatizer",
       "url": "https://jcoyle98.github.io/sanskrit-dictionary-and-lemmatizer/"
     }
-  ]
+  ],
+  "redirects": {
+    "writings/reviews/resolution-facing-ai/": "writings/essays/reviews/resolution-facing-ai/",
+    "writings/reviews/the-turn-of-the-screw/": "writings/essays/reviews/the-turn-of-the-screw/",
+    "writings/reviews/kassandra/": "writings/essays/reviews/kassandra/"
+  }
 }

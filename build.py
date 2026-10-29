@@ -231,7 +231,6 @@ def render_sequence(body):
 SECTIONS = {
     "poetry": ("Poetry", "poem", "newest first"),
     "essays": ("Essays", "essay", "newest first"),
-    "reviews": ("Reviews", "essay", "oldest first"),
 }
 RENDER = {"poem": render_poem, "essay": render_prose, "sequence": render_sequence}
 ARTICLE_CLASS = {"poem": "", "essay": "prose essay", "sequence": "sequence"}
@@ -383,15 +382,16 @@ def collection_meta(c):
 
 
 def collection_block(folder, c):
-    """A collection on the Writings page: a header that folds open to its contents."""
+    """A collection on the Writings page: its title (a link to the collection's contents page)
+    with its pieces listed, indented, underneath."""
     items = "\n".join(
         f'<li><a href="{folder}/{c["slug"]}/{p["slug"]}/">{inline_title(p["title"])}</a>'
         f'<span class="meta">{meta(p)}</span></li>'
         for p in c["pieces"]
     ) or '<li class="empty">Nothing yet.</li>'
-    return (f'<details class="collection" open>\n<summary><h3>{inline_title(c["title"])}</h3>'
-            f'{collection_meta(c)}</summary>\n'
-            f'<ol class="index">\n{items}\n</ol>\n</details>')
+    return (f'<div class="collection">\n<div class="collection-head"><h3><a href="{folder}/{c["slug"]}/">'
+            f'{inline_title(c["title"])}</a></h3>{collection_meta(c)}</div>\n'
+            f'<ol class="index">\n{items}\n</ol>\n</div>')
 
 
 def write_piece(rel_dir, p, config, depth, above="", below=""):
@@ -495,10 +495,18 @@ def build(full=False):
         sections.append(block)
 
     # the Writings are the home page (there is no About page any more); writings/ keeps working too
-    write_page("index.html", config["site_title"],
-               "<h1>Writings</h1>\n" + "\n".join(home_sections), config, depth=0)
-    write_page("writings/index.html", "Writings",
-               "<h1>Writings</h1>\n" + "\n".join(sections), config, depth=1)
+    write_page("index.html", config["site_title"], "\n".join(home_sections), config, depth=0)
+    write_page("writings/index.html", config["site_title"], "\n".join(sections), config, depth=1)
+
+    # old addresses that moved (from "redirects" in config.json) keep working
+    for old, new in config.get("redirects", {}).items():
+        target = "../" * old.strip("/").count("/") + "../" + new
+        page = OUT / old / "index.html"
+        page.parent.mkdir(parents=True, exist_ok=True)
+        page.write_text(f'<!doctype html><meta charset="utf-8"><title>Moved</title>'
+                        f'<meta http-equiv="refresh" content="0; url={target}">'
+                        f'<link rel="canonical" href="{target}"><a href="{target}">Moved here</a>\n',
+                        encoding="utf-8")
 
     (OUT / ".nojekyll").touch()
     print(f"Built {', '.join(counts)} into _site/")
